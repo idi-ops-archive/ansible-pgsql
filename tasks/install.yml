@@ -1,0 +1,43 @@
+---
+
+- name: Enable repository
+  yum:
+    name: "{{ pgsql_repo_rpm }}"
+    state: present
+
+- name: Install packages
+  yum:
+    name: "{{ item }}"
+    state: latest
+  with_items: pgsql_packages
+
+- name: Create backup directory
+  file:
+    path: pgsql_backup_path
+    state: directory
+
+- name: Verify if PostgreSQL has already been initialized
+  stat:
+    path: /var/lib/pgsql/9.4/data/postgresql.conf
+  register: st
+
+- name: Initialize PostgreSQL
+  command: /usr/pgsql-9.4/bin/postgresql94-setup initdb
+  when: not st.stat.exists
+
+- name: Configure PostgreSQL
+  template:
+    src: "{{ item }}.j2"
+    dest: "/var/lib/pgsql/9.4/data/{{ item }}"
+  with_items:
+    - pg_hba.conf
+    - postgresql.conf
+  notify:
+    - restart postgresql
+
+- name: Enable and start PostgreSQL
+  service:
+    name: postgresql-9.4
+    state: started
+    enabled: yes
+

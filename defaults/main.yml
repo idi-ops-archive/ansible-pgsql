@@ -1,0 +1,15 @@
+---
+
+pgsql_backup_path: /var/backups/pgsql
+pgsql_backup_timestamp: "{{ lookup('pipe', 'date +%Y%m%d-%H%M%S') }}"
+pgsql_backup_days: 30
+
+pgsql_allowed_network: '0.0.0.0/0'
+
+pgsql_listen_addresses: '*'
+pgsql_port: 5432
+pgsql_max_connections: 100
+
+pgsql_shared_buffers: '128MB'
+pgsql_work_mem: '4MB'
+pgsql_maintenance_work_mem: '1MB'
